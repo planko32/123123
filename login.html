@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>تسجيل الدخول</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="nav">
+      <div class="brand"><span class="dot"></span><strong>Demo Wallet</strong></div>
+      <div class="right">
+        <a class="btn" href="index.html">الرئيسية</a>
+      </div>
+    </div>
+
+    <div class="grid cols2" style="margin-top:16px">
+      <div class="card">
+        <div class="h1">تسجيل / دخول</div>
+        <p class="muted">كل دخول يعطيك Session في Supabase، ومنه نطلع <b>user_id</b>.</p>
+
+        <div class="label">Email</div>
+        <input id="email" class="input" type="email" placeholder="name@example.com" autocomplete="email" />
+
+        <div class="label">Password</div>
+        <input id="password" class="input" type="password" placeholder="••••••••" autocomplete="current-password" />
+
+        <div class="row" style="margin-top:12px">
+          <button id="btnSignIn" class="btn primary">دخول</button>
+          <button id="btnSignUp" class="btn">تسجيل جديد</button>
+        </div>
+
+        <div class="small" style="margin-top:12px">
+          إذا فعلت Email confirmation في Supabase، قد تحتاج تأكيد عبر البريد قبل الدخول.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="h2">جلسة المستخدم</div>
+        <div class="kv">
+          <div class="item">
+            <span class="muted">Status</span>
+            <span id="status">—</span>
+          </div>
+          <div class="item">
+            <span class="muted">User ID</span>
+            <span id="uid" class="code">—</span>
+          </div>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <a class="btn good" href="deposit.html">انتقل للإيداع</a>
+          <button id="btnSignOut" class="btn danger">تسجيل خروج</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <script type="module" src="assets/js/loginPage.js"></script>
+</body>
+</html>

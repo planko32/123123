@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>الإيداع – USDT (BEP20)</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="nav">
+      <div class="brand"><span class="dot"></span><strong>Demo Wallet</strong></div>
+      <div class="right">
+        <a class="btn" href="index.html">الرئيسية</a>
+        <a class="btn" href="login.html">الحساب</a>
+        <button id="btnRefresh" class="btn">تحديث الرصيد</button>
+        <button id="btnSignOut" class="btn danger">خروج</button>
+      </div>
+    </div>
+
+    <div class="grid cols2" style="margin-top:16px">
+      <div class="card">
+        <div class="h1">إيداع USDT – شبكة BEP20</div>
+        <p class="muted">اضغط "توليد عنوان" ليتم إنشاء طلب دفع عبر NOWPayments (من خلال Edge Function).</p>
+
+        <div class="grid cols3" style="margin-top:10px">
+          <div class="card" style="padding:12px">
+            <div class="label">User ID</div>
+            <div id="uid" class="code">—</div>
+          </div>
+          <div class="card" style="padding:12px">
+            <div class="label">رصيد USDT (Demo)</div>
+            <div style="font-size:22px; font-weight:800"><span id="balance">0</span> <span class="muted">USDT</span></div>
+            <div class="small">يتحدث بعد وصول IPN</div>
+          </div>
+          <div class="card" style="padding:12px">
+            <div class="label">Network</div>
+            <div class="pill"><b>USDT</b> <span class="muted">/</span> <b>BEP20</b></div>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="label">المبلغ (USDT)</div>
+        <input id="amount" class="input" type="number" inputmode="decimal" min="0" step="0.01" value="2.50" />
+
+        <div class="row" style="margin-top:12px">
+          <button id="btnCreate" class="btn primary">توليد عنوان + QR</button>
+          <button id="btnClear" class="btn">مسح</button>
+        </div>
+
+        <div id="paymentBox" style="display:none; margin-top:14px">
+          <div class="h2">بيانات الدفع</div>
+
+          <div class="label">عنوان الإيداع (pay_address)</div>
+          <div class="row" style="align-items:stretch">
+            <div id="address" class="code" style="flex:1">—</div>
+            <button id="btnCopy" class="btn">نسخ</button>
+          </div>
+
+          <div class="grid cols3" style="margin-top:10px">
+            <div class="card" style="padding:12px">
+              <div class="label">المبلغ المطلوب</div>
+              <div><b id="payAmount">—</b> <span class="muted">USDT</span></div>
+            </div>
+            <div class="card" style="padding:12px">
+              <div class="label">Payment ID</div>
+              <div id="paymentId" class="code">—</div>
+            </div>
+            <div class="card" style="padding:12px">
+              <div class="label">الحالة</div>
+              <div id="payStatus" class="pill"><span class="muted">بانتظار الدفع…</span></div>
+            </div>
+          </div>
+
+          <div class="label" style="margin-top:10px">QR Code</div>
+          <div class="row">
+            <div class="card" style="padding:12px">
+              <div id="qrcode"></div>
+              <div class="small muted" style="margin-top:8px">امسح بالـ Wallet وحوّل نفس المبلغ</div>
+            </div>
+          </div>
+
+          <div class="small" style="margin-top:10px">
+            بعد التحويل: انتظر دقيقة ثم اضغط "تحديث الرصيد". إذا IPN شغال صح، الرصيد الديمو يزيد تلقائيًا.
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="h2">سجل الحالة (Debug)</div>
+        <div id="debug" class="code" style="min-height:220px">—</div>
+        <hr>
+        <div class="small muted">
+          إذا ظهرت أخطاء RLS أو صلاحيات: لازم تسمح للمستخدم بقراءة صفه من wallet_balances، ولازم Edge Function ترجع data بشكل صحيح.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <!-- QR code generator -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script type="module" src="assets/js/depositPage.js"></script>
+</body>
+</html>
