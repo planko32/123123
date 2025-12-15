@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>اختبار NOWPayments (صفحة واحدة)</title>
+  <style>
+    :root {
+      --bg:#0b1020; --card:#111a33; --text:#e8ecff; --muted:rgba(232,236,255,.75);
+      --accent:#5c7cfa; --good:#20c997; --bad:#ff6b6b; --border:rgba(255,255,255,.12);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background: radial-gradient(1000px 700px at 20% 10%, rgba(92,124,250,.25), transparent 50%),
+                  radial-gradient(900px 600px at 80% 80%, rgba(32,201,151,.18), transparent 50%),
+                  var(--bg);
+      color:var(--text);
+    }
+    .wrap{max-width:860px; margin:0 auto; padding:22px}
+    .nav{
+      display:flex; justify-content:space-between; align-items:center; gap:12px;
+      padding:14px 16px; border:1px solid var(--border);
+      background: rgba(17,26,51,.65); backdrop-filter: blur(10px);
+      border-radius:16px;
+    }
+    .brand{display:flex; align-items:center; gap:10px; font-weight:800}
+    .dot{width:10px; height:10px; border-radius:50%; background:var(--accent); box-shadow:0 0 18px rgba(92,124,250,.6)}
+    .grid{display:grid; gap:14px; margin-top:14px}
+    @media(min-width:860px){ .grid{grid-template-columns: 1.2fr .8fr} }
+    .card{
+      border:1px solid var(--border);
+      background: rgba(17,26,51,.65); backdrop-filter: blur(10px);
+      border-radius:18px; padding:16px;
+    }
+    .h1{font-size:24px; margin:0 0 6px}
+    .muted{color:var(--muted)}
+    .label{font-size:12px; color:var(--muted); margin:10px 0 6px}
+    .input{
+      width:100%; padding:12px; border-radius:12px;
+      border:1px solid var(--border); background: rgba(255,255,255,.05);
+      color:var(--text); outline:none;
+    }
+    .input:focus{border-color: rgba(92,124,250,.55); box-shadow:0 0 0 4px rgba(92,124,250,.15)}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .btn{
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.06);
+      color:var(--text); padding:10px 12px; border-radius:12px;
+      cursor:pointer; font-weight:700;
+    }
+    .btn.primary{background: linear-gradient(135deg, rgba(92,124,250,.95), rgba(92,124,250,.55)); border-color: rgba(92,124,250,.35)}
+    .btn.good{background: linear-gradient(135deg, rgba(32,201,151,.95), rgba(32,201,151,.55)); border-color: rgba(32,201,151,.35)}
+    .btn.danger{background: rgba(255,107,107,.14); border-color: rgba(255,107,107,.35)}
+    .btn:disabled{opacity:.55; cursor:not-allowed}
+    .code{
+      font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+      font-size:12px; padding:10px 12px; border-radius:12px;
+      border:1px solid var(--border); background: rgba(0,0,0,.28);
+      word-break: break-all; overflow:auto;
+    }
+    hr{border:0; border-top:1px solid var(--border); margin:14px 0}
+    .toast{
+      position:fixed; right:16px; bottom:16px; max-width:360px;
+      border:1px solid var(--border); background: rgba(17,26,51,.85);
+      backdrop-filter: blur(10px); padding:12px; border-radius:16px; display:none;
+    }
+    .toast.show{display:block}
+    .toast.good{border-color: rgba(32,201,151,.35)}
+    .toast.bad{border-color: rgba(255,107,107,.35)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="nav">
+      <div class="brand"><span class="dot"></span> اختبار NOWPayments</div>
+      <div class="row">
+        <button id="btnLogout" class="btn danger" style="display:none">خروج</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="h1">صفحة واحدة</div>
+        <div class="muted">تعمل تسجيل/دخول سريع عبر Supabase، ثم تطلب عنوان محفظة USDT شبكة BEP20 من Edge Function عندك.</div>
+
+        <div id="authBox">
+          <hr>
+          <div class="label">Email</div>
+          <input id="email" class="input" type="email" placeholder="name@example.com" autocomplete="email">
+          <div class="label">Password</div>
+          <input id="password" class="input" type="password" placeholder="••••••••" autocomplete="current-password">
+          <div class="row" style="margin-top:12px">
+            <button id="btnSignIn" class="btn primary">دخول</button>
+            <button id="btnSignUp" class="btn">تسجيل جديد</button>
+          </div>
+          <div class="muted" style="font-size:12px; margin-top:10px">
+            إذا Email confirmation مفعّل عندك، لازم تأكيد البريد قبل الدخول.
+          </div>
+        </div>
+
+        <div id="appBox" style="display:none">
+          <hr>
+          <div class="label">User ID</div>
+          <div id="uid" class="code">—</div>
+
+          <div class="label">المبلغ (USDT)</div>
+          <input id="amount" class="input" type="number" min="0" step="0.01" value="2.50">
+
+          <div class="row" style="margin-top:12px">
+            <button id="btnCreate" class="btn good">اطلب عنوان إيداع حقيقي</button>
+            <button id="btnCopy" class="btn" disabled>نسخ العنوان</button>
+          </div>
+
+          <div id="payBox" style="display:none; margin-top:14px">
+            <div class="label">عنوان الإيداع</div>
+            <div id="address" class="code">—</div>
+
+            <div class="label">Payment ID</div>
+            <div id="paymentId" class="code">—</div>
+
+            <div class="label">QR</div>
+            <div id="qrcode" class="card" style="padding:12px; display:inline-block"></div>
+
+            <div class="muted" style="font-size:12px; margin-top:10px">
+              العنوان يأتي من Edge Function: <b>nowpayments-create-payment</b><br>
+              (لا نضع API Key في المتصفح).
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="h1">Debug</div>
+        <div id="debug" class="code" style="min-height:300px">—</div>
+        <hr>
+        <div class="muted" style="font-size:12px">
+          لو صار خطأ: غالبًا السبب إمّا Auth/RLS أو إن Edge Function لا يرجّع الحقول المتوقعة.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+    const SUPABASE_URL = "https://oyowsjjmaesspqiknvhp.supabase.co";
+    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95b3dzamptYWVzc3BxaWtudmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU4MTE4NzcsImV4cCI6MjA4MTM4Nzg3N30.aBo32xNG_dh1QD7NBI4N6jhYFLY42Xyxer2DNXxJi-w";
+    const FN_CREATE_PAYMENT = "nowpayments-create-payment";
+
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON, {
+      auth: { persistSession: true, autoRefreshToken: true },
+    });
+
+    const $ = (s)=>document.querySelector(s);
+    const logEl = $("#debug");
+    function log(msg){
+      const now = new Date().toLocaleString();
+      logEl.textContent = (logEl.textContent==="—"?"":logEl.textContent+"\n") + `[${now}] ${msg}`;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+    function toast(msg, type="good"){
+      const el = $("#toast");
+      el.textContent = msg;
+      el.className = "toast show " + (type==="bad"?"bad":"good");
+      clearTimeout(window.__t);
+      window.__t = setTimeout(()=> el.className="toast", 3200);
+    }
+
+    async function copy(text){
+      try{ await navigator.clipboard.writeText(text); toast("Copied!"); }
+      catch(e){ toast("Copy failed", "bad"); }
+    }
+
+    function normalize(data){
+      return {
+        paymentId: data?.payment_id ?? data?.paymentId ?? data?.id ?? data?.invoice_id ?? "—",
+        address: data?.pay_address ?? data?.address ?? data?.payAddress ?? data?.wallet_address ?? "—",
+      };
+    }
+
+    async function refreshUI(){
+      const { data: { session } } = await sb.auth.getSession();
+      if(session?.user){
+        $("#authBox").style.display="none";
+        $("#appBox").style.display="block";
+        $("#btnLogout").style.display="inline-block";
+        $("#uid").textContent = session.user.id;
+        log("Session OK. user_id=" + session.user.id);
+      } else {
+        $("#authBox").style.display="block";
+        $("#appBox").style.display="none";
+        $("#btnLogout").style.display="none";
+        log("No session");
+      }
+    }
+
+    $("#btnSignUp").addEventListener("click", async ()=>{
+      const email = $("#email").value.trim();
+      const password = $("#password").value;
+      if(!email || !password) return toast("اكتب الإيميل والباسورد", "bad");
+      const { error } = await sb.auth.signUp({ email, password });
+      if(error) return toast(error.message, "bad");
+      toast("تم إنشاء الحساب");
+      await refreshUI();
+    });
+
+    $("#btnSignIn").addEventListener("click", async ()=>{
+      const email = $("#email").value.trim();
+      const password = $("#password").value;
+      if(!email || !password) return toast("اكتب الإيميل والباسورد", "bad");
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if(error) return toast(error.message, "bad");
+      toast("تم تسجيل الدخول");
+      await refreshUI();
+    });
+
+    $("#btnLogout").addEventListener("click", async ()=>{
+      const { error } = await sb.auth.signOut();
+      if(error) return toast(error.message, "bad");
+      toast("تم تسجيل الخروج");
+      $("#payBox").style.display="none";
+      $("#btnCopy").disabled = true;
+      await refreshUI();
+    });
+
+    async function ensureQr(){
+      if(window.QRCode) return;
+      await new Promise((res, rej)=>{
+        const s = document.createElement("script");
+        s.src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js";
+        s.onload=res; s.onerror=rej;
+        document.head.appendChild(s);
+      });
+    }
+
+    $("#btnCreate").addEventListener("click", async ()=>{
+      const amt = Number($("#amount").value || 0);
+      if(!amt || amt<=0) return toast("اكتب مبلغ صحيح", "bad");
+
+      $("#btnCreate").disabled = true;
+      $("#payBox").style.display="none";
+      $("#btnCopy").disabled = true;
+
+      try{
+        log("Invoke Edge Function: " + FN_CREATE_PAYMENT + " amount=" + amt);
+        const { data, error } = await sb.functions.invoke(FN_CREATE_PAYMENT, {
+          body: { amount: amt, currency: "USDT", network: "BEP20" }
+        });
+        if(error) throw error;
+
+        const p = normalize(data);
+        $("#address").textContent = p.address;
+        $("#paymentId").textContent = p.paymentId;
+        $("#payBox").style.display="block";
+        $("#btnCopy").disabled = (p.address==="—");
+
+        await ensureQr();
+        const qrBox = $("#qrcode");
+        qrBox.innerHTML = "";
+        new window.QRCode(qrBox, { text: p.address, width: 180, height: 180 });
+
+        log("Payment created. id=" + p.paymentId + " address=" + p.address);
+        toast("تم توليد عنوان الإيداع");
+      } catch(e) {
+        log("Error: " + (e?.message || e));
+        toast("فشل توليد عنوان. راجع Logs للـ Edge Function", "bad");
+      } finally {
+        $("#btnCreate").disabled = false;
+      }
+    });
+
+    $("#btnCopy").addEventListener("click", async ()=>{
+      const addr = $("#address").textContent.trim();
+      if(addr && addr !== "—") await copy(addr);
+    });
+
+    await refreshUI();
+    sb.auth.onAuthStateChange(()=> refreshUI());
+  </script>
+</body>
+</html>
