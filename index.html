@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>اختبار الإيداع USDT (BEP20)</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="container">
+    <header class="header">
+      <h1>صفحة اختبار الإيداع (USDT • BEP20)</h1>
+      <p class="muted">هذه صفحة تجريبية بسيطة للعرض والاختبار فقط.</p>
+    </header>
+
+    <section class="card" id="authCard">
+      <div class="row">
+        <div>
+          <h2>تسجيل دخول تجريبي</h2>
+          <p class="muted">نولّد <code>user_id</code> محليًا (LocalStorage) لكل "دخول".</p>
+        </div>
+        <button class="btn" id="newSessionBtn">بدء جلسة جديدة</button>
+      </div>
+
+      <div class="kv">
+        <div class="k">User ID</div>
+        <div class="v"><code id="userId"></code></div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <section class="card">
+        <h2>الرصيد الديمو</h2>
+        <p class="muted">يُقرأ من جدول <code>wallet_balances</code> إن كانت سياسات RLS تسمح بالقراءة.</p>
+
+        <div class="balance">
+          <div class="bal-amount" id="demoBalance">—</div>
+          <div class="muted">USDT</div>
+        </div>
+
+        <div class="row">
+          <button class="btn secondary" id="refreshBalanceBtn">تحديث الرصيد</button>
+          <span class="muted small" id="balanceStatus"></span>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>إنشاء عنوان إيداع حقيقي</h2>
+        <p class="muted">
+          عند الضغط، يتم نداء Edge Function:
+          <code>nowpayments-create-payment</code>
+          لإرجاع عنوان USDT (BEP20) + QR.
+        </p>
+
+        <label class="label">المبلغ (USDT)</label>
+        <input class="input" id="amountInput" inputmode="decimal" placeholder="مثال: 3.00" value="3.00" />
+
+        <div class="row">
+          <button class="btn" id="createPaymentBtn">إنشاء طلب إيداع</button>
+          <span class="muted small" id="createStatus"></span>
+        </div>
+
+        <div class="result" id="paymentResult" hidden>
+          <div class="kv">
+            <div class="k">Network</div><div class="v"><span class="pill">BEP20</span></div>
+            <div class="k">Currency</div><div class="v"><span class="pill">USDT</span></div>
+            <div class="k">Amount</div><div class="v"><code id="payAmount"></code></div>
+            <div class="k">Address</div>
+            <div class="v">
+              <div class="copyrow">
+                <code id="payAddress"></code>
+                <button class="btn tiny secondary" id="copyAddressBtn">نسخ</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="qrwrap">
+            <img id="qrImg" alt="QR Code" />
+          </div>
+
+          <details class="details">
+            <summary>عرض الاستجابة الخام</summary>
+            <pre id="rawResponse"></pre>
+          </details>
+
+          <p class="muted small">
+            ملاحظة: بعد الدفع الحقيقي، من المفترض أن IPN يزيد الرصيد تلقائيًا (حسب إعداداتك وسياساتك).
+            اضغط "تحديث الرصيد" بعد تأكيد الدفع.
+          </p>
+        </div>
+      </section>
+    </section>
+
+    <footer class="footer">
+      <p class="muted small">
+        تنبيه أمان: لا تضع مفاتيح NOWPayments السرّية في الفرونت.
+        هذه الصفحة لا تحتوي أي مفاتيح سرّية — فقط مفاتيح Supabase العامة (anon) المسموح نشرها.
+      </p>
+    </footer>
+  </main>
+
+  <script type="module" src="./supabaseClient.js"></script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
